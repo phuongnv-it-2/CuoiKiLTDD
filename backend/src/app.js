@@ -11,6 +11,7 @@ const historyRouter = require('./routes/history');
 const authRouter = require('./routes/auth');
 const favoritesRouter = require('./routes/favorites');
 const translateRouter = require('./routes/translate');
+const chatRouter = require('./routes/chat');
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use('/api/ai-results', aiResultsRouter);      // MongoDB
 app.use('/api/history', historyRouter);           // MySQL, cần đăng nhập
 app.use('/api/favorites', favoritesRouter);       // MySQL, cần đăng nhập
 app.use('/api/translate', translateRouter);
+app.use('/api/chat', chatRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

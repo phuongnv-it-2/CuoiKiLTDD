@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Collections
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,7 +41,8 @@ import java.util.concurrent.Executors
 @Composable
 fun CameraScreen(
     viewModel: LensViewModel,
-    onImageCaptured: () -> Unit
+    onImageCaptured: () -> Unit,
+    onOpenChat: () -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -187,9 +189,36 @@ fun CameraScreen(
                 }
             }
         }
+
+        IconButton(
+            onClick = onOpenChat,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 48.dp, end = 16.dp)
+                .size(44.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.18f))
+        ) {
+            Icon(Icons.Default.Chat, contentDescription = "Trợ lý AI", tint = Color.White)
+        }
     }
 }
 
+@Composable
+fun PermissionScreen(onRequestPermission: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize().background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Cần quyền truy cập Camera", color = Color.White)
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onRequestPermission) {
+                Text("Cấp quyền")
+            }
+        }
+    }
+}
 
 private fun capturePhoto(
     imageCapture: ImageCapture?,

@@ -92,6 +92,7 @@ dependencies {
 
     // Gemini
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation(libs.androidx.compose.foundation.layout)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

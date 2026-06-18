@@ -76,6 +76,16 @@ interface GGLensBackendApi {
 
     @GET("api/health")
     suspend fun health(): Response<HealthResponse>
+
+    // --- Chat AI ---
+    @GET("api/chat")
+    suspend fun getChatHistory(): Response<ChatHistoryResponse>
+
+    @POST("api/chat")
+    suspend fun sendChatMessage(@Body request: SendChatRequest): Response<SendChatResponse>
+
+    @DELETE("api/chat")
+    suspend fun clearChat(): Response<BaseResponse>
 }
 
 // ─── Request DTOs ─────────────────────────────────────────────────────────────
@@ -144,6 +154,11 @@ data class HistoryItemDto(
     val ai_result_id: String?,
     val created_at: String
 )
+//AI Chatt
+data class SendChatRequest(val message: String)
+data class SendChatResponse(val success: Boolean, val reply: String?)
+data class ChatHistoryResponse(val success: Boolean, val data: List<ChatMessageDto>?)
+data class ChatMessageDto(val role: String, val content: String, val createdAt: String? = null)
 
 data class HealthResponse(val status: String, val mongo: String, val mysql: String)
 
