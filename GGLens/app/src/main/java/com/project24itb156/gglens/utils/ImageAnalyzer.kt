@@ -3,6 +3,7 @@ package com.project24itb156.gglens.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
@@ -23,6 +24,7 @@ class ImageAnalyzer(private val context: Context) {
     private val cloudVisionAnalyzer = CloudVisionAnalyzer()
     private val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     private val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+    private val barcodeScanner = BarcodeScanning.getClient()
 
     private fun preprocessBitmap(bitmap: Bitmap): Bitmap {
         val maxSize = 1024
@@ -45,6 +47,7 @@ class ImageAnalyzer(private val context: Context) {
             }
             LensMode.TRANSLATE -> analyzeTranslateWithMlKit(processed)
             LensMode.TEXT -> analyzeText(processed, mode)
+            LensMode.QR -> analyzeQr(processed)
         }
     }
 
@@ -139,6 +142,26 @@ class ImageAnalyzer(private val context: Context) {
         return LensResult(originalBitmap = bitmap, extractedText = text, mode = mode, source = "ML Kit OCR")
     }
 
+    private suspend fun analyzeQr(bitmap: Bitmap): LensResult {
+        return try {
+            val inputImage = InputImage.fromBitmap(bitmap, 0)
+            val barcodes = suspendCancellableCoroutine { cont ->
+                barcodeScanner.process(inputImage)
+                    .addOnSuccessListener { cont.resume(it) }
+                    .addOnFailureListener { cont.resumeWithException(it) }
+            }
+            val qrText = barcodes.firstOrNull()?.rawValue ?: ""
+            LensResult(
+                originalBitmap = bitmap,
+                extractedText = qrText,
+                mode = LensMode.QR,
+                source = "ML Kit QR"
+            )
+        } catch (e: Exception) {
+            LensResult(originalBitmap = bitmap, mode = LensMode.QR, error = e.message, source = "QR Error")
+        }
+    }
+
 
     private suspend fun runMlKitOcr(bitmap: Bitmap): String {
         val image = InputImage.fromBitmap(bitmap, 0)
@@ -152,6 +175,7 @@ class ImageAnalyzer(private val context: Context) {
     fun close() {
         textRecognizer.close()
         labeler.close()
+        barcodeScanner.close()
     }
 
 }

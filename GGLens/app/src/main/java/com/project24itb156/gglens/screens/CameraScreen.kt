@@ -15,10 +15,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Collections
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.project24itb156.gglens.components.ModeTabs
 import com.project24itb156.gglens.components.ScanOverlay
+import com.project24itb156.gglens.model.LensMode
 import com.project24itb156.gglens.viewmodel.LensViewModel
 import java.util.concurrent.Executors
 
@@ -44,7 +46,8 @@ fun CameraScreen(
     viewModel: LensViewModel,
     onImageCaptured: () -> Unit,
     onOpenChat: () -> Unit,
-    onOpenHistory: () -> Unit
+    onOpenHistory: () -> Unit,
+    onOpenQr: () -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -117,7 +120,7 @@ fun CameraScreen(
                             preview,
                             imgCapture
                         )
-                    } catch (ignored: Exception) { }
+                    } catch (_: Exception) { }
                 }, mainExecutor)
             }
         )
@@ -138,7 +141,7 @@ fun CameraScreen(
             ) {
                 ModeTabs(
                     selectedMode = currentMode,
-                    onModeSelected = { viewModel.setMode(it) },
+                    onModeSelected = { mode: LensMode -> viewModel.setMode(mode) },
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
 
@@ -188,6 +191,19 @@ fun CameraScreen(
                     ) {
                         Icon(Icons.Default.Cameraswitch, "Đổi camera", tint = Color.White)
                     }
+                    IconButton(
+                        onClick = onOpenQr,
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.18f))
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.QrCodeScanner,
+                            contentDescription = "Quét QR",
+                            tint = Color.White
+                        )
+                    }
                 }
             }
         }
@@ -216,7 +232,7 @@ fun CameraScreen(
                     .clip(CircleShape)
                     .background(Color.White.copy(alpha = 0.18f))
             ) {
-                Icon(Icons.Default.Chat, contentDescription = "Trợ lý AI", tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Trợ lý AI", tint = Color.White)
             }
         }
     }

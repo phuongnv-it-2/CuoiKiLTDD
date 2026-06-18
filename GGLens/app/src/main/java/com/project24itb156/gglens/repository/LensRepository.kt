@@ -7,6 +7,7 @@ import com.project24itb156.gglens.BuildConfig
 import com.project24itb156.gglens.api.*
 import com.project24itb156.gglens.model.*
 import com.project24itb156.gglens.utils.ImageAnalyzer
+import com.project24itb156.gglens.utils.QrAnalyzer
 import java.util.UUID
 
 class LensRepository(context: Context) {
@@ -14,6 +15,8 @@ class LensRepository(context: Context) {
     private val imageAnalyzer = ImageAnalyzer(context)
     private val backendApi: GGLensBackendApi = RetrofitClient.backendApi
     private val googleSearchApi: GoogleSearchApi = RetrofitClient.googleSearchApi
+
+    private val qrAnalyzer = QrAnalyzer()
 
     suspend fun analyzeImage(bitmap: Bitmap, mode: LensMode): Result<LensResult> {
         return try {
@@ -146,8 +149,65 @@ class LensRepository(context: Context) {
             Result.failure(e)
         }
     }
+    suspend fun analyzeQr(bitmap: Bitmap): Result<QrResult> {
+        return try {
+            val sessionId = UUID.randomUUID().toString()
+            val startTime = System.currentTimeMillis()
+
+            val qrResult = qrAnalyzer.analyze(bitmap)
+                ?: return Result.failure(Exception("Không tìm thấy mã QR trong ảnh"))
+
+            val processingTime = System.currentTimeMillis() - startTime
+
+            // Lưu AI result lên MongoDB
+            val aiResultId = saveQrResultToBackend(
+                sessionId = sessionId,
+                rawValue = qrResult.rawValue,
+                processingTime = processingTime
+            )
+
+            // Lưu lịch sử lên MySQL
+            saveHistory(
+                sessionId = sessionId,
+                query = qrResult.rawValue,
+                mode = LensMode.QR,
+                resultCount = 1,
+                aiResultId = aiResultId
+            )
+
+            Result.success(qrResult.copy(sessionId = sessionId, aiResultId = aiResultId))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private suspend fun saveQrResultToBackend(
+        sessionId: String,
+        rawValue: String,
+        processingTime: Long
+    ): String? {
+        return try {
+            val request = SaveAiResultRequest(
+                sessionId = sessionId,
+                mode = "QR",
+                source = "ML Kit Barcode",
+                detectedLabels = emptyList(),
+                topLabel = rawValue.take(100),
+                topConfidence = 1.0f,
+                searchQuery = rawValue,
+                extractedText = rawValue,
+                translatedText = "",
+                processingTimeMs = processingTime
+            )
+            val response = backendApi.saveAiResult(request)
+            if (response.isSuccessful) response.body()?.id else null
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     fun close() {
         imageAnalyzer.close()
+        qrAnalyzer.close()
     }
 }

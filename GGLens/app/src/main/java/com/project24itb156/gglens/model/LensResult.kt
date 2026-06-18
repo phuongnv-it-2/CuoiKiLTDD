@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
-enum class LensMode { SEARCH, TRANSLATE, TEXT, SHOPPING }
+enum class LensMode { SEARCH, TRANSLATE, TEXT, SHOPPING, QR }
 
 // ─── Domain models ───────────────────────────────────────────────────────────
 
@@ -47,6 +47,19 @@ data class LensResult(
     val searchQuery: String get() = geminiSearchQuery.ifEmpty {
         detectedLabels.take(2).joinToString(" ") { it.text }
     }
+}
+data class QrResult(
+    val rawValue: String,
+    val isUrl: Boolean,
+    val sessionId: String = "",
+    val aiResultId: String? = null
+)
+
+sealed class QrUiState {
+    object Idle : QrUiState()
+    object Scanning : QrUiState()
+    data class Found(val result: QrResult) : QrUiState()
+    data class Error(val message: String) : QrUiState()
 }
 
 // ─── UI state ─────────────────────────────────────────────────────────────────

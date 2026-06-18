@@ -75,6 +75,9 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
 
+    //QR
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+
     // ML Kit
     implementation("com.google.mlkit:text-recognition:16.0.1")
     implementation("com.google.mlkit:object-detection:17.0.2")

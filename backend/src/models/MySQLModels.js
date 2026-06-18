@@ -62,7 +62,7 @@ const SearchHistory = sequelize.define('SearchHistory', {
         allowNull: false
     },
     mode: {
-        type: DataTypes.ENUM('SEARCH', 'SHOPPING', 'TRANSLATE', 'TEXT'),
+        type: DataTypes.ENUM('SEARCH', 'SHOPPING', 'TRANSLATE', 'TEXT', 'QR'),
         allowNull: false
     },
     resultCount: {

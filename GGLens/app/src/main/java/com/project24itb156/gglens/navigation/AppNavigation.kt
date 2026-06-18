@@ -20,7 +20,8 @@ object Routes {
     const val CHAT = "chat"
     const val HISTORY = "history"
     const val AI_DETAIL = "ai_detail/{id}"
-    
+    const val QR = "qr"
+
     fun aiDetail(id: String) = "ai_detail/$id"
 }
 
@@ -71,6 +72,9 @@ fun AppNavigation() {
                 },
                 onOpenHistory = {
                     navController.navigate(Routes.HISTORY)
+                },
+                onOpenQr = {
+                    navController.navigate(Routes.QR)
                 }
             )
         }
@@ -105,6 +109,13 @@ fun AppNavigation() {
                 onBack = {
                     navController.popBackStack()
                 }
+            )
+        }
+        composable(Routes.QR) {
+            val qrViewModel: QrViewModel = viewModel()
+            QrScreen(
+                viewModel = qrViewModel,
+                onBack = { navController.popBackStack() }
             )
         }
     }

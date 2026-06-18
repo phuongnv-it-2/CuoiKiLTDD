@@ -9,7 +9,7 @@ const AiResultSchema = new mongoose.Schema({
     },
     mode: {
         type: String,
-        enum: ['SEARCH', 'SHOPPING', 'TRANSLATE', 'TEXT'],
+        enum: ['SEARCH', 'SHOPPING', 'TRANSLATE', 'TEXT', 'QR'],
         required: true
     },
     source: {
