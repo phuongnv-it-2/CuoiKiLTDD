@@ -100,13 +100,13 @@ class LensRepository(context: Context) {
             if (response.isSuccessful) {
                 val items = response.body()?.data?.map {
                     HistoryItem(
-                        id = it.id,
-                        sessionId = it.session_id,
-                        query = it.query,
-                        mode = it.mode,
-                        resultCount = it.result_count,
+                        id = it.id ?: 0,
+                        sessionId = it.session_id ?: "",
+                        query = it.query ?: "",
+                        mode = it.mode ?: "",
+                        resultCount = it.result_count ?: 0,
                         aiResultId = it.ai_result_id,
-                        createdAt = it.created_at
+                        createdAt = it.created_at ?: ""
                     )
                 } ?: emptyList()
                 Result.success(items)

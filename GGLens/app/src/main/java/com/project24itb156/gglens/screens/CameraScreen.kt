@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,7 +43,8 @@ import java.util.concurrent.Executors
 fun CameraScreen(
     viewModel: LensViewModel,
     onImageCaptured: () -> Unit,
-    onOpenChat: () -> Unit
+    onOpenChat: () -> Unit,
+    onOpenHistory: () -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -190,16 +192,32 @@ fun CameraScreen(
             }
         }
 
-        IconButton(
-            onClick = onOpenChat,
+        // Top Actions (History & Chat)
+        Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 48.dp, end = 16.dp)
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.18f))
+                .padding(top = 48.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Icon(Icons.Default.Chat, contentDescription = "Trợ lý AI", tint = Color.White)
+            IconButton(
+                onClick = onOpenHistory,
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.18f))
+            ) {
+                Icon(Icons.Default.History, contentDescription = "Lịch sử", tint = Color.White)
+            }
+
+            IconButton(
+                onClick = onOpenChat,
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.18f))
+            ) {
+                Icon(Icons.Default.Chat, contentDescription = "Trợ lý AI", tint = Color.White)
+            }
         }
     }
 }

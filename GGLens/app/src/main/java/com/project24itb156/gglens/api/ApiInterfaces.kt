@@ -2,6 +2,7 @@ package com.project24itb156.gglens.api
 
 import retrofit2.Response
 import retrofit2.http.*
+import com.google.gson.annotations.SerializedName
 
 // ─── Google Cloud Vision ──────────────────────────────────────────────────────
 
@@ -146,13 +147,17 @@ data class HistoryListResponse(
 )
 
 data class HistoryItemDto(
-    val id: Int,
-    val session_id: String,
-    val query: String,
-    val mode: String,
-    val result_count: Int,
+    val id: Int?,
+    @SerializedName("session_id", alternate = ["sessionId"])
+    val session_id: String?,
+    val query: String?,
+    val mode: String?,
+    @SerializedName("result_count", alternate = ["resultCount"])
+    val result_count: Int?,
+    @SerializedName("ai_result_id", alternate = ["aiResultId"])
     val ai_result_id: String?,
-    val created_at: String
+    @SerializedName("created_at", alternate = ["createdAt"])
+    val created_at: String?
 )
 //AI Chatt
 data class SendChatRequest(val message: String)

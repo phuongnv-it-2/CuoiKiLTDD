@@ -4,26 +4,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.project24itb156.gglens.screens.CameraScreen
-import com.project24itb156.gglens.screens.LoginScreen
-import com.project24itb156.gglens.screens.RegisterScreen
-import com.project24itb156.gglens.screens.ResultScreen
-import com.project24itb156.gglens.viewmodel.AuthViewModel
-import com.project24itb156.gglens.viewmodel.LensViewModel
-import com.project24itb156.gglens.screens.ChatScreen
-import com.project24itb156.gglens.viewmodel.ChatViewModel
+import androidx.navigation.navArgument
+import com.project24itb156.gglens.screens.*
+import com.project24itb156.gglens.viewmodel.*
 
 object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
     const val CAMERA = "camera"
     const val RESULT = "result"
-
     const val CHAT = "chat"
+    const val HISTORY = "history"
+    const val AI_DETAIL = "ai_detail/{id}"
+    
+    fun aiDetail(id: String) = "ai_detail/$id"
 }
 
 @Composable
@@ -32,6 +30,7 @@ fun AppNavigation() {
     val lensViewModel: LensViewModel = viewModel()
     val authViewModel: AuthViewModel = viewModel()
     val chatViewModel: ChatViewModel = viewModel()
+    val historyViewModel: HistoryViewModel = viewModel()
 
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
@@ -69,12 +68,34 @@ fun AppNavigation() {
                 },
                 onOpenChat = {
                     navController.navigate(Routes.CHAT)
+                },
+                onOpenHistory = {
+                    navController.navigate(Routes.HISTORY)
                 }
             )
         }
         composable(Routes.CHAT) {
             ChatScreen(
                 viewModel = chatViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.HISTORY) {
+            HistoryScreen(
+                viewModel = historyViewModel,
+                onBack = { navController.popBackStack() },
+                onItemClick = { aiId ->
+                    navController.navigate(Routes.aiDetail(aiId))
+                }
+            )
+        }
+        composable(
+            route = Routes.AI_DETAIL,
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+            AiResultDetailScreen(
+                aiResultId = id,
                 onBack = { navController.popBackStack() }
             )
         }
