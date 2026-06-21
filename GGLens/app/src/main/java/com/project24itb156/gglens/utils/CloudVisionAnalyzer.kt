@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream
 
 class CloudVisionAnalyzer {
 
-    // Dùng chung Retrofit client, không tự tạo riêng nữa
     private val visionApi = RetrofitClient.visionApi
 
     private fun bitmapToBase64(bitmap: Bitmap): String {

@@ -44,7 +44,7 @@ interface GoogleSearchApi {
 data class SearchResponse(val items: List<SearchItem>?)
 data class SearchItem(val title: String, val link: String, val snippet: String?)
 
-// ─── GG Lens Node.js Backend ─────────────────────────────────────────────────
+
 
 interface GGLensBackendApi {
 

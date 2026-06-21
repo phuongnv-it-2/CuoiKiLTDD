@@ -4,8 +4,16 @@ const ChatMessage = require('../models/ChatMessage');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-// Tạo system prompt cá nhân hóa dựa trên tên user + lịch sử quét gần đây
+
+const systemPromptCache = new Map();
+
 const buildSystemPrompt = async (userId) => {
+
+    const cached = systemPromptCache.get(userId);
+    if (cached && cached.expiredAt > Date.now()) {
+        return cached.prompt;
+    }
+
     const user = await User.findByPk(userId);
     const recentSearches = await SearchHistory.findAll({
         where: { userId },
@@ -16,16 +24,20 @@ const buildSystemPrompt = async (userId) => {
     const name = user?.displayName || 'bạn';
     const queries = recentSearches.map(s => s.query).filter(Boolean);
 
-    let context = `Bạn là trợ lý AI thân thiện trong app GG Lens (app nhận diện hình ảnh). Người dùng đang chat tên là "${name}".`;
+    let context = `Bạn là trợ lý AI thân thiện trong app GG Lens. Người dùng tên "${name}".`;
     if (queries.length > 0) {
-        context += ` Gần đây người dùng đã quét/tìm kiếm: ${queries.join(', ')}. Bạn có thể chủ động nhắc lại những thứ này khi phù hợp để câu trả lời cá nhân hóa hơn, nhưng không cần lúc nào cũng nhắc.`;
+        context += ` Gần đây quét: ${queries.join(', ')}.`;
     }
-    context += ' Trả lời ngắn gọn, tự nhiên, bằng tiếng Việt, giọng điệu gần gũi như một trợ lý cá nhân.';
+    context += ' Trả lời ngắn gọn, tiếng Việt, thân thiện.';
+
+    systemPromptCache.set(userId, {
+        prompt: context,
+        expiredAt: Date.now() + 5 * 60 * 1000
+    });
 
     return context;
 };
 
-// GET /api/chat — lấy toàn bộ lịch sử chat để hiển thị khi mở màn hình
 const getChatHistory = async (req, res) => {
     try {
         const messages = await ChatMessage.find({ userId: req.userId })
@@ -38,10 +50,13 @@ const getChatHistory = async (req, res) => {
     }
 };
 
-// POST /api/chat
+
 const sendChatMessage = async (req, res) => {
 
-    console.log('\n========== /api/chat ==========');
+    const { message } = req.body;
+    if (message.length > 500) {
+        return res.status(400).json({ error: 'Tin nhắn quá dài (tối đa 500 ký tự)' });
+    }
 
     try {
 
@@ -76,7 +91,7 @@ const sendChatMessage = async (req, res) => {
             userId: req.userId
         })
             .sort({ createdAt: -1 })
-            .limit(20);
+            .limit(6);
 
         console.log('\n=== HISTORY ===');
 
@@ -239,7 +254,7 @@ const sendChatMessage = async (req, res) => {
     }
 
 };
-// DELETE /api/chat — xoá toàn bộ lịch sử chat của user
+
 const clearChatHistory = async (req, res) => {
     try {
         await ChatMessage.deleteMany({ userId: req.userId });

@@ -83,9 +83,7 @@ class LensViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    /** 
-     * Chức năng dịch văn bản từ kết quả nhận diện
-     */
+
     fun translateText(text: String) {
         val currentState = _uiState.value
         if (currentState is LensUiState.Success) {

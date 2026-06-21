@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/mysql');
 
-// Bảng users — đã thêm email + passwordHash cho authentication thật
 const User = sequelize.define('User', {
     id: {
         type: DataTypes.INTEGER,
@@ -39,7 +38,6 @@ const User = sequelize.define('User', {
     timestamps: false
 });
 
-// Bảng search_history
 const SearchHistory = sequelize.define('SearchHistory', {
     id: {
         type: DataTypes.INTEGER,
@@ -85,7 +83,6 @@ const SearchHistory = sequelize.define('SearchHistory', {
     timestamps: false
 });
 
-// Bảng favorites — kết quả AI được user lưu lại
 const Favorite = sequelize.define('Favorite', {
     id: {
         type: DataTypes.INTEGER,
@@ -117,7 +114,6 @@ const Favorite = sequelize.define('Favorite', {
     timestamps: false
 });
 
-// Quan hệ
 User.hasMany(SearchHistory, { foreignKey: 'user_id' });
 SearchHistory.belongsTo(User, { foreignKey: 'user_id' });
 

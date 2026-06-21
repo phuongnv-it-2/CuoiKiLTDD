@@ -14,6 +14,15 @@ const translateRouter = require('./routes/translate');
 const chatRouter = require('./routes/chat');
 
 const app = express();
+app.set('trust proxy', 1);
+const rateLimit = require('express-rate-limit');
+
+const chatLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 5,
+    message: { error: 'Gửi quá nhiều tin nhắn, thử lại sau 1 phút' }
+});
+
 
 // Middleware
 app.use(cors());
@@ -28,8 +37,10 @@ app.use('/api/history', historyRouter);           // MySQL, cần đăng nhập
 app.use('/api/favorites', favoritesRouter);       // MySQL, cần đăng nhập
 app.use('/api/translate', translateRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/chat', chatLimiter, chatRouter);
 
-// Health check
+
+
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
@@ -39,7 +50,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// 404
+
 app.use((req, res) => {
     res.status(404).json({ error: `Route ${req.method} ${req.path} không tồn tại` });
 });

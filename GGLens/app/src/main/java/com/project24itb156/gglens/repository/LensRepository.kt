@@ -23,11 +23,9 @@ class LensRepository(context: Context) {
             val sessionId = UUID.randomUUID().toString()
             val startTime = System.currentTimeMillis()
 
-            // 1. Phân tích ảnh
             val result = imageAnalyzer.analyze(bitmap, mode).copy(sessionId = sessionId)
             val processingTime = System.currentTimeMillis() - startTime
 
-            // 2. Lưu kết quả AI (non-blocking)
             val aiResultId = saveAiResultToBackend(result, processingTime)
 
             Result.success(result.copy(aiResultId = aiResultId))
@@ -159,14 +157,14 @@ class LensRepository(context: Context) {
 
             val processingTime = System.currentTimeMillis() - startTime
 
-            // Lưu AI result lên MongoDB
+
             val aiResultId = saveQrResultToBackend(
                 sessionId = sessionId,
                 rawValue = qrResult.rawValue,
                 processingTime = processingTime
             )
 
-            // Lưu lịch sử lên MySQL
+
             saveHistory(
                 sessionId = sessionId,
                 query = qrResult.rawValue,

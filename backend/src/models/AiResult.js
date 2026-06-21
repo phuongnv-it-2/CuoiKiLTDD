@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Schema lưu kết quả AI từ Cloud Vision / ML Kit / Gemini
 const AiResultSchema = new mongoose.Schema({
     sessionId: {
         type: String,
@@ -16,7 +15,6 @@ const AiResultSchema = new mongoose.Schema({
         type: String, // 'Google Cloud Vision', 'ML Kit', 'Gemini', etc.
         default: ''
     },
-    // Kết quả nhận diện nhãn (SEARCH / SHOPPING)
     detectedLabels: [
         {
             text: String,

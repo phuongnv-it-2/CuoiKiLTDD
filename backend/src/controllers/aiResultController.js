@@ -1,6 +1,5 @@
 const AiResult = require('../models/AiResult');
 
-// POST /api/ai-results — Android gửi kết quả AI lên để lưu MongoDB
 const saveAiResult = async (req, res) => {
     try {
         const {
@@ -46,7 +45,6 @@ const saveAiResult = async (req, res) => {
     }
 };
 
-// GET /api/ai-results/:id — lấy chi tiết 1 AI result
 const getAiResult = async (req, res) => {
     try {
         const result = await AiResult.findById(req.params.id);
@@ -60,7 +58,6 @@ const getAiResult = async (req, res) => {
     }
 };
 
-// GET /api/ai-results/session/:sessionId — lấy tất cả AI results theo session
 const getAiResultsBySession = async (req, res) => {
     try {
         const results = await AiResult.find({ sessionId: req.params.sessionId })

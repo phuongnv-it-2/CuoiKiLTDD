@@ -1,6 +1,5 @@
 const { SearchHistory } = require('../models/MySQLModels');
 
-// POST /api/history — cần đăng nhập, lấy userId từ token (req.userId do middleware gắn)
 const saveHistory = async (req, res) => {
     try {
         const { sessionId, query, mode, resultCount, aiResultId } = req.body;
@@ -29,7 +28,6 @@ const saveHistory = async (req, res) => {
     }
 };
 
-// GET /api/history?page=1&limit=20 — chỉ trả history của user đang đăng nhập
 const getHistory = async (req, res) => {
     try {
         const { page = 1, limit = 20 } = req.query;
@@ -55,7 +53,6 @@ const getHistory = async (req, res) => {
     }
 };
 
-// DELETE /api/history/:id — chỉ xoá nếu thuộc về user đang đăng nhập
 const deleteHistory = async (req, res) => {
     try {
         const deleted = await SearchHistory.destroy({
@@ -69,7 +66,6 @@ const deleteHistory = async (req, res) => {
     }
 };
 
-// DELETE /api/history/all — xoá toàn bộ history của user đang đăng nhập
 const clearHistory = async (req, res) => {
     try {
         await SearchHistory.destroy({ where: { userId: req.userId } });
